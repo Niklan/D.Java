@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_drupal" default="compile.module.drupal">
+  <dirname property="module.drupal.basedir" file="${ant.file.module_drupal}"/>
+  
+  <property name="module.jdk.home.drupal" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.drupal" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.drupal" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.drupal" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  
+  <property name="drupal.output.dir" value="${module.drupal.basedir}/out/production/Drupal"/>
+  <property name="drupal.testoutput.dir" value="${module.drupal.basedir}/out/test/Drupal"/>
+  
+  <path id="drupal.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="drupal.module.production.classpath">
+    <path refid="${module.jdk.classpath.drupal}"/>
+  </path>
+  
+  <path id="drupal.runtime.production.module.classpath">
+    <pathelement location="${drupal.output.dir}"/>
+  </path>
+  
+  <path id="drupal.module.classpath">
+    <path refid="${module.jdk.classpath.drupal}"/>
+    <pathelement location="${drupal.output.dir}"/>
+  </path>
+  
+  <path id="drupal.runtime.module.classpath">
+    <pathelement location="${drupal.testoutput.dir}"/>
+    <pathelement location="${drupal.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.drupal">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.drupal">
+    <patternset refid="excluded.from.module.drupal"/>
+  </patternset>
+  
+  <path id="drupal.module.sourcepath">
+    <dirset dir="${module.drupal.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.drupal" depends="compile.module.drupal.production,compile.module.drupal.tests" description="Compile module Drupal"/>
+  
+  <target name="compile.module.drupal.production" depends="register.custom.compilers" description="Compile module Drupal; production classes">
+    <mkdir dir="${drupal.output.dir}"/>
+    <javac2 destdir="${drupal.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.drupal}/javac">
+      <compilerarg line="${compiler.args.drupal}"/>
+      <bootclasspath refid="drupal.module.bootclasspath"/>
+      <classpath refid="drupal.module.production.classpath"/>
+      <src refid="drupal.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.drupal"/>
+    </javac2>
+    
+    <copy todir="${drupal.output.dir}">
+      <fileset dir="${module.drupal.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.drupal.tests" depends="register.custom.compilers,compile.module.drupal.production" description="compile module Drupal; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.drupal" description="cleanup module">
+    <delete dir="${drupal.output.dir}"/>
+    <delete dir="${drupal.testoutput.dir}"/>
+  </target>
+</project>
