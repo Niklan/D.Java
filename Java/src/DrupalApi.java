@@ -16,6 +16,12 @@ import java.io.InputStreamReader;
 public class DrupalApi {
 
     /**
+     * Global variables.
+     */
+    public static String websiteUrl;
+    public static String sessId;
+
+    /**
      * Constants.
      */
     private final String USER_AGENT = "Mozilla/5.0";
@@ -32,7 +38,7 @@ public class DrupalApi {
      */
     private JSONObject sendRequest(String apiRequest, JSONObject data) throws Exception {
 
-        String url = Globals.drupalWebsiteUrl + apiRequest;
+        String url = this.websiteUrl + apiRequest;
 
         HttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(url);
@@ -86,8 +92,7 @@ public class DrupalApi {
      *
      * @param data - username
      *             - password
-     * @return - TRUE - if authorized.
-     * - FALSE - if failed.
+     * @return true or false.
      */
     public boolean auth(JSONObject data) throws Exception {
 
@@ -95,12 +100,9 @@ public class DrupalApi {
         JSONObject authResult = sendRequest("api/user/login.json", authData);
 
         if ((Integer) authResult.get("responseStatus") == 200) {
-            // All returned data.
-            //System.out.println(authResult.toString());
-            JOptionPane.showMessageDialog(null, "Authorization successful. Session ID: " + authResult.get("sessid"));
+            this.sessId = (String) authResult.get("sessid");
             return true;
-        }
-        else {
+        } else {
             JOptionPane.showMessageDialog(null, "Wrong username or password.");
             return false;
         }

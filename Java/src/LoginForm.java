@@ -1,4 +1,5 @@
 import org.json.simple.JSONObject;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,7 +23,7 @@ public class LoginForm {
             public void actionPerformed(ActionEvent e) {
 
                 // Saves website URL.
-                Globals.drupalWebsiteUrl = websiteUrlField.getText();
+                DrupalApi.websiteUrl = websiteUrlField.getText();
 
                 // Prepare JSON data.
                 JSONObject sendData = new JSONObject();
@@ -32,10 +33,10 @@ public class LoginForm {
                 DrupalApi drupal = new DrupalApi();
                 try {
                     if (drupal.auth(sendData)) {
-                        System.out.println("Authorized, show new window.");
-                    }
-                    else {
-                        System.out.println("Wrong username | password | url");
+                        // Remember successful url.
+                        DrupalApi.websiteUrl = websiteUrlField.getText();
+                    } else {
+                        System.out.println("Something goes wrong. Cause problems: wrong username, wrong password, site is not available.");
                     }
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -51,9 +52,5 @@ public class LoginForm {
         frame.setTitle("Drupal auth");
         frame.pack();
         frame.setVisible(true);
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 }
